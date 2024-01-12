@@ -1,0 +1,21 @@
+The purpose of this project is to implement system call functions, not surprisingly we started in the syscall.c 
+file, there was not a lot to do in this file but we wanted to implement the remaining callno in the switch statement 
+since only sys_reboot was coded in. After that we had to edit the syscall.h file to declare all of the new system call 
+functions that are implemented. Once this was done we decided to modify the structure of thread in order to keep track 
+of more data that is required to implement the system calls properly. we decided for simplicity that the best way to go 
+about tracking this new data was not to make a new structure but to simply keep track of the pid and ppid using two new 
+variable t_pid and t_ppid in thread. Then we moved to thread.c we decided it we wanted our code to be able to give us a thread 
+in O(1) time by using a static array with a range of 100, meaning only 100 processes can run. By using this array we can 
+use pid as an index to look up the thread and access the data quickly, also when thread_destroy is called it removes the 
+thread from the list of threads and this makes it very easy for waitpid to check if the thread has stopped running. Once 
+we had this functionality we focused on writing getpid.c getppid.c and waitpid.c which was fairly easy. Once this was done 
+we moved onto making a useful kill_curthread function which was essentially writing a good exit function which was our next
+focus in exit.c. Then we started working on the fork.c file which led to an interesting problem regarding how we wanted to 
+go about checking for the next available pid that is the lowest in value. We used a global int to keep track of the available
+pid which can change if a thread is destroyed that had a lower pid. Execv.c was interesting since we had to make sure our code
+was able to change the process on the thread. The main data structure we use is the static array we chose it because it gave us 
+access to the threads very quickly using only the pid however the downside to this was we had to make another variable to keep
+track of the best location to place any new threads that are created. However this problem was minimized by keeping track of
+the pid of threads that were recently destroyed. One alternative we considered for sorting the pid was using a queue because it
+was already included in the repository but it was not a priority queue and any sorting mechanism we implemented would have been O(n*n)
+so we decided it made the most sense to stick with the static array.
